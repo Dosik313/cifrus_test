@@ -68,7 +68,7 @@ class OrderPage(Base):
         print(f"Все четко")
 
     def enter_to_cart(self):
-        self.click_element(By.XPATH, Locators.ENTER_CART_BONNON)
+        self.click_element(By.XPATH, Locators.ENTER_CART_BUTTON)
         text = self.get_text(Locators.CART_PAGE_TITLE)
         self.assert_value(value_1=text, value_2='Моя корзина')
         print(f"все четко")

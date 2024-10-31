@@ -21,8 +21,9 @@ class TestBuy:
         order_page.enter_to_cart()
 
         cart_page = CartPage(driver, order_page.title_item, order_page.price_item)
-        cart_page.check_items_in_cart()
+        cart_page.delivery_method()
         cart_page.input_user_info()
+        cart_page.check_items_in_cart()
 
 
     # def test_order_page(self,driver):

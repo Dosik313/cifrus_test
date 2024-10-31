@@ -1,3 +1,4 @@
+import random
 from imghdr import tests
 
 from faker import Faker
@@ -12,9 +13,6 @@ class Base:
         self.driver = driver
         self.wait = WebDriverWait(self.driver, 10)
 
-    # def open(self):
-    #     return self.driver.get()
-
     def find_element(self, element):
         return self.driver.find_element(By.XPATH, element)
 
@@ -22,7 +20,7 @@ class Base:
         return self.driver.find_elements(By.XPATH, locator)
 
     def faker_smth(self):
-        faker = Faker()
+        faker = Faker('ru_RU')
         return faker
 
     def send_keys(self, locator, value):
@@ -36,20 +34,21 @@ class Base:
     def action_chains(self):
         return ActionChains(self.driver)
 
-    # def move_to_element(self, locator):
-    #     self.find_element(locator)
-    #     self.action_chains().move_to_element(locator)
+    def move_to_element(self,find_locator):
+        element = self.find_element(find_locator)
+        if element:
+            self.action_chains().move_to_element(element).perform()
+        else:
+            print(f"Локатор: {find_locator} не найден")
 
-    # def random_index(self):
-    #     return random.randint(1, 40)
+    def generate_random_index(self, start_value, end_value):
+        return random.randint(start_value, end_value)
 
     def visibility_of_element_located(self, selector, locator):
         return self.wait.until(EC.visibility_of_element_located((selector, locator)))
 
     def element_to_be_clickable(self, locator):
         return self.wait.until(EC.element_to_be_clickable(locator))
-
-
 
     def get_text(self, locator):
         text = self.visibility_of_element_located(By.XPATH, locator).text
@@ -61,6 +60,6 @@ class Base:
     def assert_value(self, value_1, value_2):
         assert value_1 == value_2, f"Ошибка валидации {value_1} : {value_2}"
 
-    def sum_values(self,value_1,value_2):
-        total = int(value_1) + int(value_2)
+    def sum_values(self,value_1,value_2, value_3):
+        total = int(value_1) + int(value_2) + int(value_3)
         return total
