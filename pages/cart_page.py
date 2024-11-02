@@ -1,10 +1,8 @@
 import time
 
-from faker import Faker
-from selenium.webdriver.common.by import By
-
 from pages.order_page import OrderPage
 from utilites.locators import Locators
+from pages.cart_page_input import CartPageInput
 
 
 class CartPage(OrderPage):
@@ -28,51 +26,60 @@ class CartPage(OrderPage):
         self.assert_value(final_price_item, price_item)
 
         price_all_item_in_cart = self.get_text(Locators.PRICE_ALL_ITEMS_IN_CART).replace(' руб.', '').replace(' ', '')
-
-        commissionn_price = self.get_text(Locators.COMMISSION)
-
+        commission_price = self.get_text(Locators.COMMISSION).replace(' ', '')
         delivery_price = self.get_text(Locators.DELIVERY_PRICE)
 
-        sum_price = self.sum_values(value_1=price_all_item_in_cart, value_2=commissionn_price, value_3=delivery_price)
+        sum_price = self.sum_values(value_1=price_all_item_in_cart, value_2=commission_price, value_3=delivery_price)
         total_price = int(self.get_text(Locators.TOTAL_PRICE).replace(' ', ''))
         print(f"Общая сумма с доставкой: {sum_price}")
         print(f"Финальная сумма: {total_price}")
         self.assert_value(sum_price, total_price)
 
     def input_user_info(self):
-        print(f"Ввожу значения в поля инпута юзера")
-        # element = self.find_element(Locators.INPUT_USER_INFO)
         self.send_keys(Locators.INPUT_NAME_USER, self.faker_smth().first_name())
         self.send_keys(Locators.INPUT_EMAIL_USER, self.faker_smth().email())
         phone_number = self.faker_smth().numerify("+7 999" + "#######")
         self.send_keys(Locators.INPUT_NUMBER_USER, phone_number)
         self.move_to_element(find_locator=Locators.INPUT_NUMBER_USER)
-        time.sleep(3)
 
     def delivery_method(self):
-        while True:
-            try:
-                click_locator = f'{Locators.INPUT_DELIVERY_METHOD}[{self.generate_random_index(1,7)}]'
-                print(click_locator)
-                self.element_to_be_clickable((By.XPATH, click_locator)).click()
-                time.sleep(2)
-                if self.element_to_be_clickable((By.XPATH, Locators.QR_WINDOW_INFO)):
-                    self.click_element(By.XPATH, Locators.QR_WINDOW_INFO)
-            except Exception as e:
-                print(f"Не нашел способ доставки {e}. Пробуем снова...")
+        if self.find_element(Locators.INPUT_DELIVERY_CDEK):
+            self.click_element(locator=Locators.INPUT_DELIVERY_CDEK)
+            check_address_str = self.get_text(Locators.ADDRESS_CHECK)
+            self.assert_value(check_address_str, 'Адрес')
+            CartPageInput(self.driver, 10).input_address_delivery()
+        else:
+            element = self.visibility_of_element_located(Locators.TEXT_PICKUP_ORDER)
+            if element:
+                element.click()
+                text_pickup = self.get_text(Locators.TEXT_PICKUP_ORDER)
+                self.assert_value(text_pickup, 'самовывоз (ул. 2-я Филёвская, 15/19)')
+                self.click_element(Locators.INPUT_CASH_PAYMENT)
+                text_cash_payment = self.get_text(Locators.TEXT_CHECK_CASH_PAYMENT)
+                self.assert_value(text_cash_payment, 'Инструкция для оплаты Наличными')
 
-        # for element in elements:
-        #     self.action_chains().move_to_element(element).perform()
-        #     print(f"enter locator")
-        #     time.sleep(2)
-        #     element.send_keys(self.faker_smth().first_name())
-        #     print(f"ввел имя")
-        #     element.send_keys(self.faker_smth().email())
-        #     time.sleep(2)
-        #     element.send_keys(self.faker_smth().phone_number())
-        #     time.sleep(2)
+    def payment_method(self):
+        check_locators = len(self.find_elements(Locators.INPUT_PAYMENT_METHOD))
+        current_locator = self.random_randint(1, check_locators)
+        locator_payment = f'{Locators.INPUT_PAYMENT_METHOD}[{current_locator}]'
+        if check_locators == 1:
+            self.click_element(locator_payment)
+            self.move_to_element(Locators.TEXT_BANK_PAYMENT)
+            text_bank_payment = self.get_text(Locators.TEXT_BANK_PAYMENT)
+            self.assert_value(text_bank_payment, 'Инструкция для оплаты Дебетовой картой через Сбербанк Онлайн (комиссия 3%)')
+        elif check_locators == 2:
+            self.click_element(locator_payment)
+            self.move_to_element(Locators.TEXT_QR_PAYMENT)
+            check_qr_payment = self.get_text(Locators.TEXT_QR_PAYMENT)
+            self.assert_value(check_qr_payment, 'Инструкция для оплаты Банковской картой по Системе быстрых платежей по QR (комиссия 5%)')
+        else:
+            self.click_element(locator_payment)
+            check_legal_entities = self.get_text(Locators.TEXT_LEGAL_ENTITIES)
+            self.assert_value(check_legal_entities, 'Реквизиты')
+            self.window_info()
+            CartPageInput(self.driver, 10).input_details()
 
-            # self.send_keys(element, self.faker_smth().first_name())
-            # print(f"ввел имя")
-
+    def click_confirm_button(self):
+        self.move_to_element(Locators.CONFIRM_BUTTON)
+        self.click_element(Locators.CONFIRM_BUTTON)
         time.sleep(3)

@@ -1,11 +1,13 @@
 import random
-from imghdr import tests
 
 from faker import Faker
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
+
+from utilites.locators import Locators
+
 
 class Base:
 
@@ -26,7 +28,6 @@ class Base:
     def send_keys(self, locator, value):
         element = self.find_element(locator)
         if element:
-            # Преобразуем значение в строку, если это необходимо
             element.send_keys(str(value))
         else:
             print(f"Элемент с локатором {locator} не найден.")
@@ -44,22 +45,29 @@ class Base:
     def generate_random_index(self, start_value, end_value):
         return random.randint(start_value, end_value)
 
-    def visibility_of_element_located(self, selector, locator):
-        return self.wait.until(EC.visibility_of_element_located((selector, locator)))
+    def visibility_of_element_located(self, locator):
+        return self.wait.until(EC.visibility_of_element_located((By.XPATH, locator)))
 
     def element_to_be_clickable(self, locator):
         return self.wait.until(EC.element_to_be_clickable(locator))
 
     def get_text(self, locator):
-        text = self.visibility_of_element_located(By.XPATH, locator).text
+        text = self.visibility_of_element_located(locator).text
         return text
 
-    def click_element(self, selector, locator):
-        return self.visibility_of_element_located(selector, locator).click()
+    def click_element(self, locator):
+        return self.visibility_of_element_located(locator).click()
 
     def assert_value(self, value_1, value_2):
         assert value_1 == value_2, f"Ошибка валидации {value_1} : {value_2}"
 
-    def sum_values(self,value_1,value_2, value_3):
+    def sum_values(self, value_1, value_2, value_3):
         total = int(value_1) + int(value_2) + int(value_3)
         return total
+
+    def random_randint(self, value_1, value_2):
+        return random.randint(value_1, value_2)
+
+    def window_info(self):
+        if self.element_to_be_clickable((By.XPATH, Locators.QR_WINDOW_INFO)):
+            self.click_element(Locators.QR_WINDOW_INFO)

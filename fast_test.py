@@ -1,5 +1,4 @@
 import time
-from importlib.metadata import Lookup
 
 from selenium.webdriver import ActionChains
 from selenium.webdriver.support import expected_conditions as EC
@@ -19,8 +18,7 @@ WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, Locators.Y
 print(f"клик успешен")
 time.sleep(2)
 
-action = ActionChains(driver)
-action.eleme
+
 
 all_locators = driver.find_elements(By.XPATH,'//div[@class="name"]')
 print(len(all_locators))

@@ -15,7 +15,6 @@ class MainPage(Base):
     def get_you_city(self):
         return self.element_to_be_clickable((By.XPATH, Locators.YOU_CITY_ENTER))
 
-
     def get_all_category(self):
         return self.element_to_be_clickable((By.XPATH, Locators.all_category))
 
@@ -23,19 +22,13 @@ class MainPage(Base):
         # Генерируем случайный локатор от 1 до 20
         random_index = random.randint(1, 20)
         random_locator = f'(//a[@class="dropdown-toggle"])[{random_index}]'
-        category = self.element_to_be_clickable((By.XPATH, random_locator))
+        category = self.element_to_be_clickable(random_locator)
         text_category = category.text
         print(f"Название категории: {text_category}")
         category.click()
         time.sleep(1)
 
-
-
-
     def main_page(self):
         self.get_you_city().click()
         time.sleep(2)
         self.get_all_category().click()
-    #
-    # def check_category(self):
-    #     self.click_random_dropdown()
