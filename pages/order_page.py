@@ -16,11 +16,12 @@ class OrderPage(Base):
         """Получаем случайный локатор от 1 до максимума на странице"""
         all_locators = len(self.driver.find_elements(Locators.all_name_locators))
         print(f"Всего локаторов {all_locators}")
-        self.random_index_value = random.randint(1, all_locators)  # Выбираем случайный индекс
+        self.random_index_value = random.randint(1, all_locators)
         print(f"Выбранный локатор: {self.random_index_value}")
         return self.random_index_value
 
     def get_title_item(self):
+        """Получаем нгазвание товара"""
         name_locator = f'{Locators.name_item}[{self.random_index_value}]'
         element = self.find_element(name_locator)
         self.action_chains().move_to_element(element).perform()
@@ -30,6 +31,7 @@ class OrderPage(Base):
         return self.title_item
 
     def get_price_item(self):
+        """Получаем цену товара"""
         price_locator = f'{Locators.price_item}[{self.random_index_value}]'
         element = self.find_element(price_locator)
         self.action_chains().move_to_element(element).perform()
@@ -39,6 +41,7 @@ class OrderPage(Base):
         return self.price_item
 
     def click_add_co_cart(self):
+        """Кликаем добавить в корзину"""
         add_to_cart_locator = f'{Locators.add_to_cart_item}[{self.random_index_value}]'
         time.sleep(1)
         element = self.find_element(add_to_cart_locator)
@@ -59,6 +62,7 @@ class OrderPage(Base):
         self.assert_value(final_price_item, price_item_stored_cleaned)
 
     def enter_to_cart(self):
+        """Переходим в корзину"""
         self.click_element(By.XPATH, Locators.ENTER_CART_BUTTON)
         text = self.get_text(Locators.CART_PAGE_TITLE)
         self.assert_value(value_1=text, value_2='Моя корзина')

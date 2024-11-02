@@ -19,8 +19,8 @@ class MainPage(Base):
         return self.element_to_be_clickable((By.XPATH, Locators.all_category))
 
     def click_random_dropdown(self):
-        # Генерируем случайный локатор от 1 до 20
-        random_index = random.randint(1, 20)
+        """Выбираем случайную категорию товаров"""
+        random_index = random.randint(1, 20) # Генерируем случайный локатор от 1 до 20
         random_locator = f'(//a[@class="dropdown-toggle"])[{random_index}]'
         category = self.element_to_be_clickable(random_locator)
         text_category = category.text
